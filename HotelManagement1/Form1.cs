@@ -78,6 +78,8 @@ namespace HotelManagement1
             string course = txtcourse.Text;
             string fee = txtfee.Text;
 
+
+
             if(Mode == true)
             {
                 sql = "insert into StudentT(stdname,course,fee) values(@stdname,@course,@fee)";
@@ -88,7 +90,7 @@ namespace HotelManagement1
                 cmd.Parameters.AddWithValue("@course", course);
                 cmd.Parameters.AddWithValue("@fee", fee);
 
-                MessageBox.Show("Record added");
+                MessageBox.Show("Record added...........");
                 cmd.ExecuteNonQuery();
 
                 txtname.Clear();
@@ -99,18 +101,31 @@ namespace HotelManagement1
             }
             else
             {
+                /* 8) this part is the, user clicked the edit button details will appiers on the text boxes,after edit the data and after user should click the 
+                      save button again ,now details edit and save to the dataGrid view..................... */
 
+                id = dataGridView1.CurrentRow.Cells[0].Value.ToString();
 
+                sql = "update StudentT set stdname = @stdname, course = @course, fee = @fee where id = @id ";
+                con.Open();
+                cmd = new SqlCommand(sql, con);
 
+                cmd.Parameters.AddWithValue("@stdname", name);
+                cmd.Parameters.AddWithValue("@course", course);
+                cmd.Parameters.AddWithValue("@fee", fee);
+                cmd.Parameters.AddWithValue("@id", id);
 
+                MessageBox.Show("Record Updated..........");
+                cmd.ExecuteNonQuery();
 
+                txtname.Clear();
+                txtcourse.Clear();
+                txtfee.Clear();
+                txtname.Focus();
 
-
-
-
-
-
-
+                // 10) After edited the recode again button change as "Save"....
+                btnsave.Text = "Save";
+                Mode = true;
 
             }
             con.Close();
@@ -120,12 +135,54 @@ namespace HotelManagement1
      // 6),7) dataGride view's code section..................
         private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            if (e.ColumnIndex == dataGridView1.Columns["editColumn"].Index && e.RowIndex >= 0)
-            {    //mode is true = ADD records , mode is false = UPDATE the recode..
+                                                                                                                            //  [[ EDIT and DELETE button code in if else ]]
+
+            if (e.ColumnIndex == dataGridView1.Columns["editColumn"].Index && e.RowIndex >= 0){    
+                                                                                                                          //mode is true = ADD records , mode is false = UPDATE the recode..
                 Mode = false;
                 id = dataGridView1.CurrentRow.Cells[0].Value.ToString();
-                getID(id);  // call the getID function
+                getID(id);                                                                                               // call the getID function
+                                                                                                                         // 9) when user click the edit button in the data Gride view,after Save" button should be change as "Edit"..........
+                btnsave.Text = "Edit";
             }
+            else if (e.ColumnIndex == dataGridView1.Columns["deleteColumn"].Index && e.RowIndex >= 0){                  // 13) if user click the "delete" button, data should be deleted.........
+
+                Mode = false;
+                id = dataGridView1.CurrentRow.Cells[0].Value.ToString();
+                sql = "delete from StudentT where id = @id ";
+                con.Open();
+                cmd = new SqlCommand(sql, con);
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.ExecuteNonQuery();
+                MessageBox.Show("Recode deleted");
+                con.Close();
+
+
+
+
+            }
+        }
+
+        private void Form1_Load(object sender, EventArgs e)
+        {
+
+        }
+        private void btnclear_Click(object sender, EventArgs e)
+        {
+                                                                                                                          // 12) if user want clear the text boxes user should be click the "Edit" button and anfter "Clear" button...............
+            txtname.Clear();
+            txtcourse.Clear();
+            txtfee.Clear();
+            txtname.Focus();
+
+            btnsave.Text = "Save";
+            Mode = true;
+        }
+
+        private void btnrefresh_Click(object sender, EventArgs e)
+        {
+            Load1();                                                                                                               // 11) same load() functon.....
+
         }
     }
 }
